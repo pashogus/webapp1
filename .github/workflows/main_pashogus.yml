@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -31,26 +31,17 @@ jobs:
           path: '${{ github.workspace }}/target/*.jar'
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     environment:
       name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
-  
+
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
           name: java-app
-      
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_FBE6BEE9DC124AF384D47DCB23BACB13 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_72C7EE7B97004D83AE714111A5B6B490 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_118C5A05D1774B6F9E66E609CF13D101 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -58,5 +49,5 @@ jobs:
         with:
           app-name: 'pashogus'
           slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_ACE7F8CEDAFF498D92F789F988AF31D5 }}
           package: '*.jar'
-          
